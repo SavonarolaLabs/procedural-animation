@@ -16,8 +16,9 @@
   </head>
   <body>
     <script type="module">
-      import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
-      import { FBXLoader } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/FBXLoader.js';
+      // Import three.js and FBXLoader from node_modules
+      import * as THREE from './node_modules/three/build/three.module.js';
+      import { FBXLoader } from './node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
       // Scene setup
       const scene = new THREE.Scene();
@@ -28,7 +29,7 @@
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.outputEncoding = THREE.sRGBEncoding; // Use sRGB encoding
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 0.5;
+      renderer.toneMappingExposure = 1;
       renderer.physicallyCorrectLights = true;
       document.body.appendChild(renderer.domElement);
 
@@ -76,7 +77,7 @@
       const groundMaterial = new THREE.MeshStandardMaterial({
         map: textures[0],
         roughness: 1,
-        metalness: 1,
+        metalness: 0.8,
       });
       //groundMaterial.color.setScalar(1); // Adjust this scalar value to control brightness
 
