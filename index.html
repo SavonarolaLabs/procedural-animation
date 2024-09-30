@@ -1,13 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Game</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <canvas id="gameCanvas"></canvas>
-    <script type="module" src="/main.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FBX Viewer</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
+      import { FBXLoader } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/FBXLoader.js';
+
+      // Scene setup
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding; // Use sRGB encoding
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1;
+      renderer.physicallyCorrectLights = true;
+      document.body.appendChild(renderer.domElement);
+
+      // Lighting setup
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+      hemiLight.position.set(0, 50, 0);
+      scene.add(hemiLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(20, 50, 10);
+      directionalLight.castShadow = true;
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
+      directionalLight.shadow.camera.near = 0.5;
+      directionalLight.shadow.camera.far = 500;
+      directionalLight.shadow.camera.left = -50;
+      directionalLight.shadow.camera.right = 50;
+      directionalLight.shadow.camera.top = 50;
+      directionalLight.shadow.camera.bottom = -50;
+      directionalLight.shadow.bias = -0.0001; // Adjust shadow bias
+      scene.add(directionalLight);
+
+      // Ground plane
+      const groundGeometry = new THREE.PlaneGeometry(500, 500);
+      const groundMaterial = new THREE.MeshStandardMaterial({
+        color: 0x808080,
+        roughness: 0.8,
+        metalness: 0.2,
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.5;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // Load FBX model
+      const loader = new FBXLoader();
+      loader.load(
+        'LowPoly_SpiderBot_Rzenn.fbx',
+        (fbx) => {
+          fbx.scale.set(0.05, 0.05, 0.05);
+          fbx.position.set(0, 15, 0);
+          fbx.traverse(function (child) {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              if (child.material) {
+                if (child.material.map) {
+                  child.material.map.encoding = THREE.sRGBEncoding;
+                }
+                child.material.needsUpdate = true;
+              } else {
+                // Assign default material if none
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xcccccc,
+                });
+              }
+            }
+          });
+          scene.add(fbx);
+        },
+        undefined,
+        (error) => {
+          console.error('Error loading FBX:', error);
+        }
+      );
+
+      // Camera positioning
+      camera.position.set(20, 30, 40);
+      camera.lookAt(0, 0, 0);
+
+      // Camera movement variables
+      let moveForward = false,
+        moveBackward = false,
+        moveLeft = false,
+        moveRight = false;
+      let zoomIn = false,
+        zoomOut = false;
+
+      function handleKeyDown(event) {
+        switch (event.code) {
+          case 'KeyW':
+            moveForward = true;
+            break;
+          case 'KeyS':
+            moveBackward = true;
+            break;
+          case 'KeyA':
+            moveLeft = true;
+            break;
+          case 'KeyD':
+            moveRight = true;
+            break;
+          case 'Digit1':
+            zoomIn = true;
+            break;
+          case 'Digit2':
+            zoomOut = true;
+            break;
+        }
+      }
+
+      function handleKeyUp(event) {
+        switch (event.code) {
+          case 'KeyW':
+            moveForward = false;
+            break;
+          case 'KeyS':
+            moveBackward = false;
+            break;
+          case 'KeyA':
+            moveLeft = false;
+            break;
+          case 'KeyD':
+            moveRight = false;
+            break;
+          case 'Digit1':
+            zoomIn = false;
+            break;
+          case 'Digit2':
+            zoomOut = false;
+            break;
+        }
+      }
+
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
+
+      // Movement speed
+      const moveSpeed = 1.0;
+      const zoomSpeed = 0.5;
+
+      // Variables for dragging
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+
+      // Mouse drag controls
+      renderer.domElement.addEventListener('mousedown', (event) => {
+        if (event.button === 0) {
+          isDragging = true;
+          previousMousePosition = { x: event.clientX, y: event.clientY };
+        }
+      });
+
+      renderer.domElement.addEventListener('mousemove', (event) => {
+        if (isDragging) {
+          const deltaX = event.clientX - previousMousePosition.x;
+          const deltaY = event.clientY - previousMousePosition.y;
+
+          camera.position.x -= deltaX * 0.05;
+          camera.position.z += deltaY * 0.05;
+
+          previousMousePosition = { x: event.clientX, y: event.clientY };
+        }
+      });
+
+      renderer.domElement.addEventListener('mouseup', (event) => {
+        if (event.button === 0) {
+          isDragging = false;
+        }
+      });
+
+      renderer.domElement.addEventListener('mouseleave', () => {
+        isDragging = false;
+      });
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // WASD movement on XZ plane
+        if (moveForward) camera.position.z -= moveSpeed;
+        if (moveBackward) camera.position.z += moveSpeed;
+        if (moveLeft) camera.position.x -= moveSpeed;
+        if (moveRight) camera.position.x += moveSpeed;
+
+        // Zoom controls (1 to zoom in, 2 to zoom out)
+        if (zoomIn) {
+          camera.position.add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(zoomSpeed));
+        }
+        if (zoomOut) {
+          camera.position.add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(-zoomSpeed));
+        }
+
+        // Maintain isometric look
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Handle window resizing
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
 </html>
