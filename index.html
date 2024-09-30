@@ -16,21 +16,19 @@
   </head>
   <body>
     <script type="module">
-      // Import three.js and FBXLoader from node_modules
       import * as THREE from './node_modules/three/build/three.module.js';
       import { FBXLoader } from './node_modules/three/examples/jsm/loaders/FBXLoader.js';
+      import { loadTextures } from './textures.js';
+      import { setupCamera, setupMovementControls } from './camera.js';
 
-      // Scene setup
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const camera = setupCamera();
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.shadowMap.enabled = true;
-      //renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.outputEncoding = THREE.sRGBEncoding; // Use sRGB encoding
+      renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.toneMapping = THREE.ReinhardToneMapping;
-      renderer.toneMappingExposure = 0.6;
-      //renderer.physicallyCorrectLights = true;
+      renderer.toneMappingExposure = 2.3;
       document.body.appendChild(renderer.domElement);
 
       // Lighting setup
@@ -46,227 +44,23 @@
 
       const textureLoader = new THREE.TextureLoader();
 
-      export const textures = [
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/168.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/168_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/151.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/151_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/152.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/152_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/153.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/153_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/154.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/154_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/155.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/155_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/156.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/156_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/157.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/157_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/158.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/158_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/159.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/159_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/160.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/160_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/161.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/161_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/162.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/162_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/163.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/163_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/164.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/164_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/165.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/165_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/166.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/166_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/167.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/167_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/169.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/169_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/170.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/170_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/171.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/171_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/172.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/172_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/173.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/173_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/174.jpg'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/174_norm.jpg'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/175.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/175_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/176.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/176_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/177.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/177_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/178.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/178_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/179.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/179_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/180.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/180_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/181.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/181_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/182.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/182_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/183.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/183_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/184.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/184_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/185.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/185_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/186.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/186_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/187.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/187_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/188.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/188_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/189.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/189_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/190.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/190_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/191.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/191_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/192.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/192_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/193.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/193_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/194.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/194_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/195.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/195_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/196.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/196_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/197.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/197_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/198.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/198_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/199.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/199_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/200.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/200_norm.JPG'),
-        },
-      ];
-
-      // Set texture wrapping and repeat
+      const textures = loadTextures(textureLoader);
       textures.forEach((texture) => {
         texture.color.wrapS = texture.color.wrapT = THREE.RepeatWrapping;
         texture.normal.wrapS = texture.normal.wrapT = THREE.RepeatWrapping;
-        texture.color.repeat.set(20, 20);
-        texture.normal.repeat.set(20, 20);
+        const x = 50;
+        texture.color.repeat.set(x, x);
+        texture.normal.repeat.set(x, x);
       });
 
       // Ground plane with initial texture and normal map
       const groundGeometry = new THREE.PlaneGeometry(500, 500);
       const groundMaterial = new THREE.MeshStandardMaterial({
-        map: textures[0].color, // Apply color texture
-        normalMap: textures[0].normal, // Apply normal map
-        roughness: 0.9, // High roughness for a stone-like feel
-        metalness: 0.2, // Low metalness for a non-metallic stone look
+        map: textures[0].color,
+        normalMap: textures[0].normal,
+        roughness: 1,
+        metalness: 0.7,
       });
-
-      //groundMaterial.color.setScalar(1); // Adjust this scalar value to control brightness
 
       const ground = new THREE.Mesh(groundGeometry, groundMaterial);
       ground.rotation.x = -Math.PI / 2;
@@ -296,60 +90,18 @@
           }
         }
 
-        // Apply both the color texture and the normal map
         groundMaterial.map = textures[currentIndex].color;
         groundMaterial.normalMap = textures[currentIndex].normal;
         groundMaterial.needsUpdate = true;
       }
 
-      // Example usage to manually cycle through textures
-      // Call cycleTexture() at your desired timing
-      // setInterval(cycleTexture, 2000); // Uncomment for auto cycling
-
-      // Load FBX model
       const loader = new FBXLoader();
-      //   loader.load(
-      //     'LowPoly_SpiderBot_Rzenn.fbx',
-      //     (fbx) => {
-      //       fbx.scale.set(0.05, 0.05, 0.05);
-      //       fbx.position.set(0, 15, 0);
-      //       fbx.traverse(function (child) {
-      //         if (child.isMesh) {
-      //           child.castShadow = true;
-      //           child.receiveShadow = true;
-      //           if (child.material) {
-      //             if (child.material.map) {
-      //               child.material.map.anisotropy = 16;
-      //             }
-      //             // Make the material brighter
-      //             child.material.emissive = new THREE.Color(0x0eeeff); // White emissive color for brightness
-      //             child.material.emissiveIntensity = 0.5; // Increase this value to make it brighter (up to 1 or more)
-
-      //             // Optional: brighten the base color
-      //             child.material.color = new THREE.Color(0x0eeeff); // Adjust to a brighter color if needed
-
-      //             child.material.needsUpdate = true;
-      //           }
-      //         }
-      //       });
-      //       scene.add(fbx);
-      //     },
-      //     undefined,
-      //     (error) => {
-      //       console.error('Error loading FBX:', error);
-      //     }
-      //   );
-
-      // Load FBX model with proper textures from DefaultTextures
-
-      // Load FBX model with proper textures from DefaultTextures
       loader.load(
         'bot.fbx',
         (fbx) => {
-          fbx.scale.set(1, 1, 1); // Try using (1, 1, 1) instead of (0.05, 0.05, 0.05)
+          fbx.scale.set(1, 1, 1);
           fbx.position.set(0, 0, 0);
 
-          // Apply textures from DefaultTextures
           const baseColor = textureLoader.load('DefaultTextures/DefaultMaterial_Base_Color.png');
           const normalMap = textureLoader.load('DefaultTextures/DefaultMaterial_Normal.png');
           const roughnessMap = textureLoader.load('DefaultTextures/DefaultMaterial_Roughness.png');
@@ -357,13 +109,11 @@
           const aoMap = textureLoader.load('DefaultTextures/DefaultMaterial_Mixed_AO.png');
           const emissiveMap = textureLoader.load('DefaultTextures/DefaultMaterial_Emissive.png');
 
-          // Traverse the FBX model to apply textures
           fbx.traverse((child) => {
             if (child.isMesh) {
               child.castShadow = true;
               child.receiveShadow = true;
 
-              // Create and assign a new material with supported textures only
               child.material = new THREE.MeshStandardMaterial({
                 map: baseColor,
                 normalMap: normalMap,
@@ -371,13 +121,12 @@
                 metalnessMap: metalnessMap,
                 aoMap: aoMap,
                 emissiveMap: emissiveMap,
-                emissive: new THREE.Color(0xffffff), // Emissive color
-                emissiveIntensity: 0.5, // Adjust as needed
-                roughness: 0.8, // Adjust for stone-like or metal properties
-                metalness: 0.5, // Adjust based on material preference
+                emissive: new THREE.Color(0xffffff),
+                emissiveIntensity: 0.5,
+                roughness: 0.8,
+                metalness: 0.5,
               });
 
-              // Make sure material is updated
               child.material.needsUpdate = true;
             }
           });
@@ -390,127 +139,12 @@
         }
       );
 
-      // Camera positioning
-      camera.position.set(3, 6, 8);
-      camera.lookAt(0, 0, 0);
+      const cameraControls = setupMovementControls(camera, renderer);
 
-      // Camera movement variables
-      let moveForward = false,
-        moveBackward = false,
-        moveLeft = false,
-        moveRight = false;
-      let zoomIn = false,
-        zoomOut = false;
-
-      function handleKeyDown(event) {
-        switch (event.code) {
-          case 'KeyW':
-            moveForward = true;
-            break;
-          case 'KeyS':
-            moveBackward = true;
-            break;
-          case 'KeyA':
-            moveLeft = true;
-            break;
-          case 'KeyD':
-            moveRight = true;
-            break;
-          case 'Digit1':
-            zoomIn = true;
-            break;
-          case 'Digit2':
-            zoomOut = true;
-            break;
-          case 'Digit3':
-            cycleTexture();
-            break;
-        }
-      }
-
-      function handleKeyUp(event) {
-        switch (event.code) {
-          case 'KeyW':
-            moveForward = false;
-            break;
-          case 'KeyS':
-            moveBackward = false;
-            break;
-          case 'KeyA':
-            moveLeft = false;
-            break;
-          case 'KeyD':
-            moveRight = false;
-            break;
-          case 'Digit1':
-            zoomIn = false;
-            break;
-          case 'Digit2':
-            zoomOut = false;
-            break;
-        }
-      }
-
-      window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('keyup', handleKeyUp);
-
-      // Movement speed
-      const moveSpeed = 1.0;
-      const zoomSpeed = 0.5;
-
-      // Variables for dragging
-      let isDragging = false;
-      let previousMousePosition = { x: 0, y: 0 };
-
-      // Mouse drag controls
-      renderer.domElement.addEventListener('mousedown', (event) => {
-        if (event.button === 0) {
-          isDragging = true;
-          previousMousePosition = { x: event.clientX, y: event.clientY };
-        }
-      });
-
-      renderer.domElement.addEventListener('mousemove', (event) => {
-        if (isDragging) {
-          const deltaX = event.clientX - previousMousePosition.x;
-          const deltaY = event.clientY - previousMousePosition.y;
-
-          camera.position.x -= deltaX * 0.05;
-          camera.position.z += deltaY * 0.05;
-
-          previousMousePosition = { x: event.clientX, y: event.clientY };
-        }
-      });
-
-      renderer.domElement.addEventListener('mouseup', (event) => {
-        if (event.button === 0) {
-          isDragging = false;
-        }
-      });
-
-      renderer.domElement.addEventListener('mouseleave', () => {
-        isDragging = false;
-      });
-
-      // Animation loop
       function animate() {
         requestAnimationFrame(animate);
 
-        // WASD movement on XZ plane
-        if (moveForward) camera.position.z -= moveSpeed;
-        if (moveBackward) camera.position.z += moveSpeed;
-        if (moveLeft) camera.position.x -= moveSpeed;
-        if (moveRight) camera.position.x += moveSpeed;
-
-        // Zoom controls (1 to zoom in, 2 to zoom out)
-        if (zoomIn) {
-          camera.position.add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(zoomSpeed));
-        }
-        if (zoomOut) {
-          camera.position.add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(-zoomSpeed));
-        }
-
-        // Maintain isometric look
+        cameraControls.update();
         camera.lookAt(0, 0, 0);
 
         spotLight.position.set(camera.position.x + 10, camera.position.y + 10, camera.position.z + 10);
@@ -519,7 +153,6 @@
       }
       animate();
 
-      // Handle window resizing
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
