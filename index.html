@@ -34,51 +34,231 @@
       document.body.appendChild(renderer.domElement);
 
       // Lighting setup
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
       scene.add(ambientLight);
 
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
-      hemiLight.position.set(0, 20, 0);
-      scene.add(hemiLight);
-
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(20, 50, 10);
-      directionalLight.castShadow = true;
-      directionalLight.shadow.mapSize.width = 2048;
-      directionalLight.shadow.mapSize.height = 2048;
-      directionalLight.shadow.camera.near = 0.5;
-      directionalLight.shadow.camera.far = 500;
-      directionalLight.shadow.camera.left = -50;
-      directionalLight.shadow.camera.right = 50;
-      directionalLight.shadow.camera.top = 50;
-      directionalLight.shadow.camera.bottom = -50;
-      directionalLight.shadow.bias = -0.0001; // Adjust shadow bias
-      scene.add(directionalLight);
-
-      // Load texture for the ground (change the path to your texture)
       const textureLoader = new THREE.TextureLoader();
-      const textures = [
-        //textureLoader.load('Free_pixel_tiles_pack/grass_1.png'),
-        //textureLoader.load('Free_pixel_tiles_pack/grass_2.png'),
-        //textureLoader.load('Free_pixel_tiles_pack/grass_3.png'),
-        textureLoader.load('Free_pixel_tiles_pack/cobblestone_3.png'),
-        textureLoader.load('Free_pixel_tiles_pack/cobblestone_1.png'),
-        textureLoader.load('Free_pixel_tiles_pack/cobblestone_2.png'),
+
+      export const textures = [
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/151.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/151_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/152.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/152_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/153.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/153_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/154.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/154_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/155.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/155_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/156.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/156_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/157.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/157_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/158.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/158_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/159.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/159_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/160.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/160_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/161.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/161_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/162.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/162_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/163.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/163_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/164.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/164_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/165.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/165_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/166.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/166_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/167.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/167_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/168.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/168_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/169.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/169_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/170.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/170_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/171.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/171_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/172.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/172_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/173.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/173_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/174.jpg'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/174_norm.jpg'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/175.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/175_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/176.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/176_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/177.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/177_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/178.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/178_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/179.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/179_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/180.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/180_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/181.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/181_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/182.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/182_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/183.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/183_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/184.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/184_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/185.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/185_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/186.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/186_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/187.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/187_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/188.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/188_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/189.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/189_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/190.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/190_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/191.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/191_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/192.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/192_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/193.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/193_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/194.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/194_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/195.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/195_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/196.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/196_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/197.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/197_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/198.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/198_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/199.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/199_norm.JPG'),
+        },
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/200.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/200_norm.JPG'),
+        },
       ];
 
-      // Set repeat for each texture
+      // Set texture wrapping and repeat
       textures.forEach((texture) => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(20, 20);
+        texture.color.wrapS = texture.color.wrapT = THREE.RepeatWrapping;
+        texture.normal.wrapS = texture.normal.wrapT = THREE.RepeatWrapping;
+        texture.color.repeat.set(20, 20);
+        texture.normal.repeat.set(20, 20);
       });
 
-      // Ground plane with initial texture
+      // Ground plane with initial texture and normal map
       const groundGeometry = new THREE.PlaneGeometry(500, 500);
       const groundMaterial = new THREE.MeshStandardMaterial({
-        map: textures[0],
-        roughness: 1,
-        metalness: 0.8,
+        map: textures[0].color, // Apply color texture
+        normalMap: textures[0].normal, // Apply normal map
+        roughness: 0.9, // High roughness for a stone-like feel
+        metalness: 0.2, // Low metalness for a non-metallic stone look
       });
+
       //groundMaterial.color.setScalar(1); // Adjust this scalar value to control brightness
 
       const ground = new THREE.Mesh(groundGeometry, groundMaterial);
@@ -109,7 +289,9 @@
           }
         }
 
-        groundMaterial.map = textures[currentIndex];
+        // Apply both the color texture and the normal map
+        groundMaterial.map = textures[currentIndex].color;
+        groundMaterial.normalMap = textures[currentIndex].normal;
         groundMaterial.needsUpdate = true;
       }
 
