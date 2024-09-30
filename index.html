@@ -26,20 +26,31 @@
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      //renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.outputEncoding = THREE.sRGBEncoding; // Use sRGB encoding
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1;
-      renderer.physicallyCorrectLights = true;
+      renderer.toneMapping = THREE.ReinhardToneMapping;
+      renderer.toneMappingExposure = 0.6;
+      //renderer.physicallyCorrectLights = true;
       document.body.appendChild(renderer.domElement);
 
       // Lighting setup
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
       scene.add(ambientLight);
 
+      const spotLight = new THREE.SpotLight(0xffa95c, 4);
+      spotLight.castShadow = true;
+      spotLight.shadow.bias = -0.0001;
+      spotLight.shadow.mapSize.width = 1024 * 4;
+      spotLight.shadow.mapSize.height = 1024 * 4;
+      scene.add(spotLight);
+
       const textureLoader = new THREE.TextureLoader();
 
       export const textures = [
+        {
+          color: textureLoader.load('50-free-textures-4+normalmaps/168.JPG'),
+          normal: textureLoader.load('50-free-textures-4+normalmaps/168_norm.JPG'),
+        },
         {
           color: textureLoader.load('50-free-textures-4+normalmaps/151.JPG'),
           normal: textureLoader.load('50-free-textures-4+normalmaps/151_norm.JPG'),
@@ -107,10 +118,6 @@
         {
           color: textureLoader.load('50-free-textures-4+normalmaps/167.JPG'),
           normal: textureLoader.load('50-free-textures-4+normalmaps/167_norm.JPG'),
-        },
-        {
-          color: textureLoader.load('50-free-textures-4+normalmaps/168.JPG'),
-          normal: textureLoader.load('50-free-textures-4+normalmaps/168_norm.JPG'),
         },
         {
           color: textureLoader.load('50-free-textures-4+normalmaps/169.JPG'),
@@ -301,28 +308,80 @@
 
       // Load FBX model
       const loader = new FBXLoader();
+      //   loader.load(
+      //     'LowPoly_SpiderBot_Rzenn.fbx',
+      //     (fbx) => {
+      //       fbx.scale.set(0.05, 0.05, 0.05);
+      //       fbx.position.set(0, 15, 0);
+      //       fbx.traverse(function (child) {
+      //         if (child.isMesh) {
+      //           child.castShadow = true;
+      //           child.receiveShadow = true;
+      //           if (child.material) {
+      //             if (child.material.map) {
+      //               child.material.map.anisotropy = 16;
+      //             }
+      //             // Make the material brighter
+      //             child.material.emissive = new THREE.Color(0x0eeeff); // White emissive color for brightness
+      //             child.material.emissiveIntensity = 0.5; // Increase this value to make it brighter (up to 1 or more)
+
+      //             // Optional: brighten the base color
+      //             child.material.color = new THREE.Color(0x0eeeff); // Adjust to a brighter color if needed
+
+      //             child.material.needsUpdate = true;
+      //           }
+      //         }
+      //       });
+      //       scene.add(fbx);
+      //     },
+      //     undefined,
+      //     (error) => {
+      //       console.error('Error loading FBX:', error);
+      //     }
+      //   );
+
+      // Load FBX model with proper textures from DefaultTextures
+
+      // Load FBX model with proper textures from DefaultTextures
       loader.load(
-        'LowPoly_SpiderBot_Rzenn.fbx',
+        'bot.fbx',
         (fbx) => {
-          fbx.scale.set(0.05, 0.05, 0.05);
-          fbx.position.set(0, 15, 0);
-          fbx.traverse(function (child) {
+          fbx.scale.set(1, 1, 1); // Try using (1, 1, 1) instead of (0.05, 0.05, 0.05)
+          fbx.position.set(0, 0, 0);
+
+          // Apply textures from DefaultTextures
+          const baseColor = textureLoader.load('DefaultTextures/DefaultMaterial_Base_Color.png');
+          const normalMap = textureLoader.load('DefaultTextures/DefaultMaterial_Normal.png');
+          const roughnessMap = textureLoader.load('DefaultTextures/DefaultMaterial_Roughness.png');
+          const metalnessMap = textureLoader.load('DefaultTextures/DefaultMaterial_Metallic.png');
+          const aoMap = textureLoader.load('DefaultTextures/DefaultMaterial_Mixed_AO.png');
+          const emissiveMap = textureLoader.load('DefaultTextures/DefaultMaterial_Emissive.png');
+
+          // Traverse the FBX model to apply textures
+          fbx.traverse((child) => {
             if (child.isMesh) {
               child.castShadow = true;
-              child.receiveShadow = false;
-              if (child.material) {
-                if (child.material.map) {
-                  child.material.map.encoding = THREE.sRGBEncoding;
-                }
-                child.material.needsUpdate = true;
-              } else {
-                // Assign default material if none
-                child.material = new THREE.MeshStandardMaterial({
-                  color: 0xcccccc,
-                });
-              }
+              child.receiveShadow = true;
+
+              // Create and assign a new material with supported textures only
+              child.material = new THREE.MeshStandardMaterial({
+                map: baseColor,
+                normalMap: normalMap,
+                roughnessMap: roughnessMap,
+                metalnessMap: metalnessMap,
+                aoMap: aoMap,
+                emissiveMap: emissiveMap,
+                emissive: new THREE.Color(0xffffff), // Emissive color
+                emissiveIntensity: 0.5, // Adjust as needed
+                roughness: 0.8, // Adjust for stone-like or metal properties
+                metalness: 0.5, // Adjust based on material preference
+              });
+
+              // Make sure material is updated
+              child.material.needsUpdate = true;
             }
           });
+
           scene.add(fbx);
         },
         undefined,
@@ -332,7 +391,7 @@
       );
 
       // Camera positioning
-      camera.position.set(20, 30, 40);
+      camera.position.set(3, 6, 8);
       camera.lookAt(0, 0, 0);
 
       // Camera movement variables
@@ -453,6 +512,8 @@
 
         // Maintain isometric look
         camera.lookAt(0, 0, 0);
+
+        spotLight.position.set(camera.position.x + 10, camera.position.y + 10, camera.position.z + 10);
 
         renderer.render(scene, camera);
       }
