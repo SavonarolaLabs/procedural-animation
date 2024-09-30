@@ -28,16 +28,16 @@
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.outputEncoding = THREE.sRGBEncoding; // Use sRGB encoding
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1;
+      renderer.toneMappingExposure = 0.5;
       renderer.physicallyCorrectLights = true;
       document.body.appendChild(renderer.domElement);
 
       // Lighting setup
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
       scene.add(ambientLight);
 
       const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
-      hemiLight.position.set(0, 50, 0);
+      hemiLight.position.set(0, 20, 0);
       scene.add(hemiLight);
 
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -57,12 +57,12 @@
       // Load texture for the ground (change the path to your texture)
       const textureLoader = new THREE.TextureLoader();
       const textures = [
-        textureLoader.load('Free_pixel_tiles_pack/grass_1.png'),
-        textureLoader.load('Free_pixel_tiles_pack/grass_2.png'),
-        textureLoader.load('Free_pixel_tiles_pack/grass_3.png'),
+        //textureLoader.load('Free_pixel_tiles_pack/grass_1.png'),
+        //textureLoader.load('Free_pixel_tiles_pack/grass_2.png'),
+        //textureLoader.load('Free_pixel_tiles_pack/grass_3.png'),
+        textureLoader.load('Free_pixel_tiles_pack/cobblestone_3.png'),
         textureLoader.load('Free_pixel_tiles_pack/cobblestone_1.png'),
         textureLoader.load('Free_pixel_tiles_pack/cobblestone_2.png'),
-        textureLoader.load('Free_pixel_tiles_pack/cobblestone_3.png'),
       ];
 
       // Set repeat for each texture
@@ -75,9 +75,11 @@
       const groundGeometry = new THREE.PlaneGeometry(500, 500);
       const groundMaterial = new THREE.MeshStandardMaterial({
         map: textures[0],
-        roughness: 0.8,
-        metalness: 0.2,
+        roughness: 1,
+        metalness: 1,
       });
+      //groundMaterial.color.setScalar(1); // Adjust this scalar value to control brightness
+
       const ground = new THREE.Mesh(groundGeometry, groundMaterial);
       ground.rotation.x = -Math.PI / 2;
       ground.position.y = -0.5;
