@@ -54,10 +54,27 @@
       directionalLight.shadow.bias = -0.0001; // Adjust shadow bias
       scene.add(directionalLight);
 
-      // Ground plane
+      // Load texture for the ground (change the path to your texture)
+      const textureLoader = new THREE.TextureLoader();
+      const textures = [
+        textureLoader.load('Free_pixel_tiles_pack/grass_1.png'),
+        textureLoader.load('Free_pixel_tiles_pack/grass_2.png'),
+        textureLoader.load('Free_pixel_tiles_pack/grass_3.png'),
+        textureLoader.load('Free_pixel_tiles_pack/cobblestone_1.png'),
+        textureLoader.load('Free_pixel_tiles_pack/cobblestone_2.png'),
+        textureLoader.load('Free_pixel_tiles_pack/cobblestone_3.png'),
+      ];
+
+      // Set repeat for each texture
+      textures.forEach((texture) => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(20, 20);
+      });
+
+      // Ground plane with initial texture
       const groundGeometry = new THREE.PlaneGeometry(500, 500);
       const groundMaterial = new THREE.MeshStandardMaterial({
-        color: 0x808080,
+        map: textures[0],
         roughness: 0.8,
         metalness: 0.2,
       });
@@ -66,6 +83,36 @@
       ground.position.y = -0.5;
       ground.receiveShadow = true;
       scene.add(ground);
+
+      let currentIndex = 0;
+      let forward = true;
+      let forwardCycles = 0;
+      let backwardCycles = 0;
+
+      function cycleTexture() {
+        if (forward) {
+          currentIndex = (currentIndex + 1) % textures.length;
+          if (currentIndex === 0) forwardCycles++;
+          if (forwardCycles === 3) {
+            forward = false;
+            forwardCycles = 0;
+          }
+        } else {
+          currentIndex = (currentIndex - 1 + textures.length) % textures.length;
+          if (currentIndex === textures.length - 1) backwardCycles++;
+          if (backwardCycles === 4) {
+            forward = true;
+            backwardCycles = 0;
+          }
+        }
+
+        groundMaterial.map = textures[currentIndex];
+        groundMaterial.needsUpdate = true;
+      }
+
+      // Example usage to manually cycle through textures
+      // Call cycleTexture() at your desired timing
+      // setInterval(cycleTexture, 2000); // Uncomment for auto cycling
 
       // Load FBX model
       const loader = new FBXLoader();
@@ -130,6 +177,9 @@
             break;
           case 'Digit2':
             zoomOut = true;
+            break;
+          case 'Digit3':
+            cycleTexture();
             break;
         }
       }
