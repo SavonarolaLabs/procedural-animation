@@ -1,6 +1,12 @@
 export function loadTextures(textureLoader) {
   return [
     {
+      color: textureLoader.load('stone_floor_textures/green_tan_tiles.png'),
+    },
+    {
+      color: textureLoader.load('stone_floor_textures/terra_dirt.png'),
+    },
+    {
       color: textureLoader.load('50-free-textures-4+normalmaps/199.JPG'),
       normal: textureLoader.load('50-free-textures-4+normalmaps/199_norm.JPG'),
     },

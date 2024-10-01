@@ -3,7 +3,7 @@ import { OrbitControls } from './node_modules/three/examples/jsm/controls/OrbitC
 export function setupCamera(THREE) {
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(-15, 30, -15); // Default position
-  camera.lookAt(0, 5, 0); // Default target position
+  camera.lookAt(0, 0, 0); // Default target position
 
   return camera;
 }
@@ -17,7 +17,7 @@ export function setupMovementControls(camera, renderer, THREE, target = new THRE
     zoomOut = false;
   let orbitalMode = false;
 
-  const moveSpeed = 1.0;
+  const moveSpeed = 0.1;
   const zoomSpeed = 0.5;
 
   // Store default camera position and target
