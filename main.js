@@ -1,87 +1,61 @@
-const canvas = document.getElementById('gameCanvas');
-const gl = canvas.getContext('webgl');
+import * as THREE from './node_modules/three/build/three.module.js';
+import { loadTextures } from './textures.js';
+import { setupCamera, setupMovementControls } from './camera.js';
+import { addResizeListener } from './resize.js';
+import { cycleTexture } from './cycleTexture.js';
+import { loadBot } from './botLoader.js';
+import { createGround } from './ground.js';
 
-// Resize canvas to fill the screen
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  gl.viewport(0, 0, canvas.width, canvas.height);
-}
+const scene = new THREE.Scene();
+const camera = setupCamera();
+const renderer = new THREE.WebGLRenderer({ antialias: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+// Lighting setup
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+scene.add(ambientLight);
 
-// Vertex shader program
-const vertexShaderSource = `
-attribute vec2 position;
-void main() {
-  gl_Position = vec4(position, 0.0, 1.0);
-}`;
+const textureLoader = new THREE.TextureLoader();
+const textures = loadTextures(textureLoader);
 
-// Fragment shader program
-const fragmentShaderSource = `
-void main() {
-  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color
-}`;
+textures.forEach((texture) => {
+  texture.color.wrapS = texture.color.wrapT = THREE.RepeatWrapping;
+  texture.normal.wrapS = texture.normal.wrapT = THREE.RepeatWrapping;
+  const x = 50;
+  texture.color.repeat.set(x, x);
+  texture.normal.repeat.set(x, x);
+});
 
-// Compile and link shaders
-function compileShader(source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  return shader;
-}
-const vertexShader = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
-const fragmentShader = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
-const program = gl.createProgram();
-gl.attachShader(program, vertexShader);
-gl.attachShader(program, fragmentShader);
-gl.linkProgram(program);
-gl.useProgram(program);
+// Create ground and get the ground material
+const groundMaterial = createGround(scene, textures, THREE);
 
-// 2. Generate circle vertices
-function drawCircle(x, y, r) {
-  function generateCircleVertices(cx, cy, radius, segments) {
-    const vertices = [cx, cy]; // Center of the circle
-    for (let i = 0; i <= segments; i++) {
-      const angle = (i / segments) * 2 * Math.PI;
-      vertices.push(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
-    }
-    return new Float32Array(vertices);
+// Load the bot into the scene
+loadBot(scene, textureLoader, THREE);
+
+window.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case '0':
+      // Cycle forward
+      cycleTexture(groundMaterial, textures, true);
+      break;
+    case '9':
+      // Cycle backward
+      cycleTexture(groundMaterial, textures, false);
+      break;
   }
+});
 
-  const segments = 100; // The more segments, the smoother the circle
-  const vertices = generateCircleVertices(x, y, r, segments);
+const cameraControls = setupMovementControls(camera, renderer);
 
-  // 3. Create buffer and draw
-  const positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+function animate() {
+  requestAnimationFrame(animate);
 
-  const positionLocation = gl.getAttribLocation(program, 'position');
-  gl.enableVertexAttribArray(positionLocation);
-  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+  cameraControls.update();
+  camera.lookAt(0, 0, 0);
 
-  // Clear and draw the circle
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-
-  gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, vertices.length / 2);
+  renderer.render(scene, camera);
 }
+animate();
 
-drawCircle();
-
-function pause(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
-let dx = 0.005,
-  x = 0,
-  y = 0;
-while (true) {
-  drawCircle(x, y, 0.1);
-  x += dx;
-  y = Math.sin(x * 5) * 0.3;
-  if (x > 1.5) x = -1.5;
-  await pause(10);
-}
+addResizeListener(window, camera, renderer);
