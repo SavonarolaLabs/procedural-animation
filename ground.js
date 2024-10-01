@@ -16,11 +16,14 @@ export function createGround(scene, textures, THREE) {
   ground.rotation.x = -Math.PI / 2;
   //ground.position.y = -0.5;
   ground.receiveShadow = true;
+  ground.name = 'ground';
 
   const groundAxesHelper = new THREE.AxesHelper(5); // Adjust size as needed
   ground.add(groundAxesHelper);
 
+  ground.rotation.x = -Math.PI / 2; // Rotate to make it lie flat on the X-Z plane
+
   scene.add(ground);
 
-  return groundMaterial;
+  return { groundMaterial, ground };
 }

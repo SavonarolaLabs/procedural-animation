@@ -5,6 +5,7 @@ import { addResizeListener } from './resize.js';
 import { cycleTexture } from './cycleTexture.js';
 import { createGround } from './ground.js';
 import { loadSkeleton } from './skeletonLoader.js';
+import { setupCharacterMovement } from './characterMovement.js';
 
 const scene = new THREE.Scene();
 const camera = setupCamera(THREE);
@@ -13,7 +14,8 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Lighting setup
+renderer.domElement.addEventListener('contextmenu', (event) => event.preventDefault());
+
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
 scene.add(ambientLight);
 
@@ -22,100 +24,65 @@ const textures = loadTextures(textureLoader);
 
 textures.forEach((texture) => {
   texture.color.wrapS = texture.color.wrapT = THREE.RepeatWrapping;
-  //texture.normal.wrapS = texture.normal.wrapT = THREE.RepeatWrapping;
   const x = 100;
   texture.color.repeat.set(x, x);
-  //texture.normal.repeat.set(x, x);
 });
 
-// Create ground and get the ground material
-const groundMaterial = createGround(scene, textures, THREE);
+const { groundMaterial, ground } = createGround(scene, textures, THREE);
 
-// Animation mixer and clip index for skeleton
 let mixer;
 let animations = [];
 let currentAnimation = 0;
-let currentAction = null; // Track the currently playing action
-const actions = {}; // Store each action by animation index
+let currentAction = null;
+const actions = {};
 
-// Set up movement controls and access orbit controls for updating target
 const cameraControls = setupMovementControls(camera, renderer, THREE);
 const { orbitControls } = cameraControls;
 
-// Load the skeleton model with animations
+let characterMovement;
+
 loadSkeleton(scene, textureLoader, THREE, 'Skeleton_Warrior').then(({ model, animations: animClips }) => {
   if (animClips.length) {
     animations = animClips;
 
-    // Set up animation mixer
     mixer = new THREE.AnimationMixer(model);
-
     model.position.x = 0;
     model.position.z = 2;
 
-    // Create and store actions for all animations
     animations.forEach((clip, index) => {
       const action = mixer.clipAction(clip);
-      action.clampWhenFinished = true; // Stop at the last frame
-      action.loop = THREE.LoopRepeat; // Adjust loop type as needed
+      action.clampWhenFinished = true;
+      action.loop = THREE.LoopRepeat;
       actions[index] = action;
     });
 
-    // Play the first animation by default
-    //playAnimation(1);
+    characterMovement = setupCharacterMovement(scene, model, camera, renderer, THREE);
+
+    scene.add(model);
+
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+
+    orbitControls.target.copy(center);
+    orbitControls.update();
   }
-
-  // Find the center of the model
-  const box = new THREE.Box3().setFromObject(model);
-  const center = box.getCenter(new THREE.Vector3());
-
-  // Update orbitControls target to center of the model
-  orbitControls.target.copy(center);
-  orbitControls.update();
 });
 
-// Play the specified animation
-function playAnimation(index) {
-  if (mixer && animations.length) {
-    // Stop the current action if one is playing
-    if (currentAction) {
-      currentAction.stop(); // Immediately stop the current action
-    }
-
-    // Get or create the action for the specified animation
-    const action = actions[index];
-
-    // Adjust the speed of the animation
-    const speedFactor = 1; // Make sure you use your specific speed factor
-    action.timeScale = speedFactor;
-
-    // Set up the new action and play it
-    action.reset();
-    action.play();
-
-    // Track the current action
-    currentAction = action;
-  }
-}
-
-// Handle key events for animations and texture cycling
 window.addEventListener('keydown', (event) => {
   switch (event.key.toUpperCase()) {
     case '0':
-      // Cycle texture forward
       cycleTexture(groundMaterial, textures, true);
       break;
     case '9':
-      // Cycle texture backward
       cycleTexture(groundMaterial, textures, false);
       break;
-    case 'X': // Play next animation
+    case 'X':
       if (animations.length) {
         currentAnimation = (currentAnimation + 1) % animations.length;
         playAnimation(currentAnimation);
       }
       break;
-    case 'Z': // Play previous animation
+    case 'Z':
       if (animations.length) {
         currentAnimation = (currentAnimation - 1 + animations.length) % animations.length;
         playAnimation(currentAnimation);
@@ -124,7 +91,22 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
-// Create a clock to track time between frames
+function playAnimation(index) {
+  if (mixer && animations.length) {
+    if (currentAction) {
+      currentAction.stop();
+    }
+
+    const action = actions[index];
+    const speedFactor = 1;
+    action.timeScale = speedFactor;
+    action.reset();
+    action.play();
+
+    currentAction = action;
+  }
+}
+
 const clock = new THREE.Clock();
 
 function animate() {
@@ -132,9 +114,10 @@ function animate() {
 
   cameraControls.update();
 
-  // Update animations if available
+  if (characterMovement) characterMovement.update();
+
   if (mixer) {
-    const delta = clock.getDelta(); // Time since last frame in seconds
+    const delta = clock.getDelta();
     mixer.update(delta);
   }
 
