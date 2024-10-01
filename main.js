@@ -58,7 +58,7 @@ loadSkeleton(scene, textureLoader, THREE, 'Skeleton_Warrior').then(({ model, ani
     });
 
     // Play the first animation by default
-    playAnimation(2);
+    playAnimation(1);
   }
 
   // Find the center of the model
@@ -82,7 +82,7 @@ function playAnimation(index) {
     const action = actions[index];
 
     // Adjust the speed of the animation
-    const speedFactor = 0.5; // Make sure you use your specific speed factor
+    const speedFactor = 1; // Make sure you use your specific speed factor
     action.timeScale = speedFactor;
 
     // Set up the new action and play it
@@ -96,7 +96,7 @@ function playAnimation(index) {
 
 // Handle key events for animations and texture cycling
 window.addEventListener('keydown', (event) => {
-  switch (event.key) {
+  switch (event.key.toUpperCase()) {
     case '0':
       // Cycle texture forward
       cycleTexture(groundMaterial, textures, true);
