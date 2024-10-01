@@ -9,6 +9,7 @@ import { loadSkeleton } from './skeletonLoader.js';
 const scene = new THREE.Scene();
 const camera = setupCamera(THREE);
 const renderer = new THREE.WebGLRenderer({ antialias: false });
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -21,10 +22,10 @@ const textures = loadTextures(textureLoader);
 
 textures.forEach((texture) => {
   texture.color.wrapS = texture.color.wrapT = THREE.RepeatWrapping;
-  texture.normal.wrapS = texture.normal.wrapT = THREE.RepeatWrapping;
-  const x = 50;
+  //texture.normal.wrapS = texture.normal.wrapT = THREE.RepeatWrapping;
+  const x = 100;
   texture.color.repeat.set(x, x);
-  texture.normal.repeat.set(x, x);
+  //texture.normal.repeat.set(x, x);
 });
 
 // Create ground and get the ground material
