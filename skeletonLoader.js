@@ -29,6 +29,8 @@ export function loadSkeleton(scene, textureLoader, THREE, name) {
           }
         });
 
+        const charAxesHelper = new THREE.AxesHelper(5); // Adjust size as needed
+        fbx.add(charAxesHelper);
         scene.add(fbx);
 
         // Check for animations and log them

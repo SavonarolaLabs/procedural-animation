@@ -50,6 +50,9 @@ loadSkeleton(scene, textureLoader, THREE, 'Skeleton_Warrior').then(({ model, ani
     // Set up animation mixer
     mixer = new THREE.AnimationMixer(model);
 
+    model.position.x = 0;
+    model.position.z = 2;
+
     // Create and store actions for all animations
     animations.forEach((clip, index) => {
       const action = mixer.clipAction(clip);
@@ -59,7 +62,7 @@ loadSkeleton(scene, textureLoader, THREE, 'Skeleton_Warrior').then(({ model, ani
     });
 
     // Play the first animation by default
-    playAnimation(1);
+    //playAnimation(1);
   }
 
   // Find the center of the model

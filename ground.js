@@ -17,6 +17,9 @@ export function createGround(scene, textures, THREE) {
   //ground.position.y = -0.5;
   ground.receiveShadow = true;
 
+  const groundAxesHelper = new THREE.AxesHelper(5); // Adjust size as needed
+  ground.add(groundAxesHelper);
+
   scene.add(ground);
 
   return groundMaterial;
