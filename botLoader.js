@@ -1,19 +1,20 @@
 import { FBXLoader } from './node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
 /**
- * Loads an FBX bot model, applies textures, and returns its animations.
+ * Loads a bot model with optional textures and animations.
  * @param {THREE.Scene} scene - The scene to add the bot to.
  * @param {THREE.TextureLoader} textureLoader - The texture loader for loading textures.
  * @param {typeof import('three')} THREE - The THREE module reference.
- * @returns {Promise<THREE.AnimationClip[]>} A promise resolving with the animations.
+ * @param {string} name - The name of the bot model to load (e.g., "bot").
+ * @returns {Promise<THREE.Object3D>} A promise that resolves to the loaded model and its animations.
  */
-export function loadBot(scene, textureLoader, THREE) {
+export function loadBot(scene, textureLoader, THREE, name = 'bot') {
   return new Promise((resolve, reject) => {
     const loader = new FBXLoader();
     loader.load(
-      'bot.fbx',
+      `./${name}.fbx`,
       (fbx) => {
-        // Load textures (optional, adjust as needed)
+        // Load optional textures (adjust as needed)
         const baseColor = textureLoader.load('DefaultTextures/DefaultMaterial_Base_Color.png');
         const normalMap = textureLoader.load('DefaultTextures/DefaultMaterial_Normal.png');
         const roughnessMap = textureLoader.load('DefaultTextures/DefaultMaterial_Roughness.png');
@@ -21,7 +22,7 @@ export function loadBot(scene, textureLoader, THREE) {
         const aoMap = textureLoader.load('DefaultTextures/DefaultMaterial_Mixed_AO.png');
         const emissiveMap = textureLoader.load('DefaultTextures/DefaultMaterial_Emissive.png');
 
-        // Apply textures to the model
+        // Apply textures and properties to the model
         fbx.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
@@ -42,20 +43,22 @@ export function loadBot(scene, textureLoader, THREE) {
           }
         });
 
+        const botAxesHelper = new THREE.AxesHelper(5); // Add axes helper for debugging
+        fbx.add(botAxesHelper);
         scene.add(fbx);
 
-        // Check and log animations
+        // Check for animations and resolve them
         if (fbx.animations && fbx.animations.length) {
-          console.log('Available animations:', fbx.animations);
-          resolve(fbx.animations); // Return the animations array
+          console.log(`Available animations for ${name}:`, fbx.animations.length);
+          resolve({ model: fbx, animations: fbx.animations });
         } else {
-          console.log('No animations found in the FBX model.');
-          resolve([]); // No animations available
+          console.log(`No animations found in ${name} model.`);
+          resolve({ model: fbx, animations: [] });
         }
       },
       undefined,
       (error) => {
-        console.error('Error loading FBX:', error);
+        console.error(`Error loading ${name}:`, error);
         reject(error);
       }
     );

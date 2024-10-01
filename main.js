@@ -5,6 +5,7 @@ import { addResizeListener } from './resize.js';
 import { cycleTexture } from './cycleTexture.js';
 import { createGround } from './ground.js';
 import { loadSkeleton } from './skeletonLoader.js';
+import { loadBot } from './botLoader.js';
 import { setupCharacterMovement } from './characterMovement.js';
 
 const scene = new THREE.Scene();
@@ -12,23 +13,36 @@ const camera = setupCamera(THREE);
 const renderer = new THREE.WebGLRenderer({ antialias: false });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 renderer.domElement.addEventListener('contextmenu', (event) => event.preventDefault());
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(10, 20, 10);
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width = 2048;
+directionalLight.shadow.mapSize.height = 2048;
+scene.add(directionalLight);
+
+const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+scene.add(lightHelper);
 
 const textureLoader = new THREE.TextureLoader();
 const textures = loadTextures(textureLoader);
 
 textures.forEach((texture) => {
   texture.color.wrapS = texture.color.wrapT = THREE.RepeatWrapping;
-  const x = 100;
+  const x = 50;
   texture.color.repeat.set(x, x);
 });
 
 const { groundMaterial, ground } = createGround(scene, textures, THREE);
+ground.receiveShadow = true;
 
 let mixer;
 let animations = [];
@@ -41,13 +55,22 @@ const { orbitControls } = cameraControls;
 
 let characterMovement;
 
-loadSkeleton(scene, textureLoader, THREE, 'Skeleton_Warrior').then(({ model, animations: animClips }) => {
+loadBot(scene, textureLoader, THREE, 'bot').then(({ model, animations: animClips }) => {
+  handleModelLoad(model, animClips);
+});
+
+function handleModelLoad(model, animClips) {
   if (animClips.length) {
     animations = animClips;
 
     mixer = new THREE.AnimationMixer(model);
-    model.position.x = 0;
-    model.position.z = 2;
+    model.position.set(0, 0, 2);
+
+    model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+      }
+    });
 
     animations.forEach((clip, index) => {
       const action = mixer.clipAction(clip);
@@ -66,7 +89,7 @@ loadSkeleton(scene, textureLoader, THREE, 'Skeleton_Warrior').then(({ model, ani
     orbitControls.target.copy(center);
     orbitControls.update();
   }
-});
+}
 
 window.addEventListener('keydown', (event) => {
   switch (event.key.toUpperCase()) {
@@ -120,6 +143,10 @@ function animate() {
     const delta = clock.getDelta();
     mixer.update(delta);
   }
+
+  // Keep light source behind the camera
+  directionalLight.position.copy(camera.position);
+  directionalLight.position.add(new THREE.Vector3(10, 10, 10)); // Slightly offset the light from the camera position
 
   renderer.render(scene, camera);
 }

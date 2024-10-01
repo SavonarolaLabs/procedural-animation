@@ -2,8 +2,8 @@ import { OrbitControls } from './node_modules/three/examples/jsm/controls/OrbitC
 
 export function setupCamera(THREE) {
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(-15, 25, -15); // Default position
-  camera.lookAt(0, 0, 0); // Default target position
+  camera.position.set(-15, 50, -15); // Elevate camera higher
+  camera.lookAt(new THREE.Vector3(0, 0, 0)); // Adjust to look towards the character
 
   return camera;
 }
