@@ -1,6 +1,10 @@
 export function loadTextures(textureLoader) {
   return [
     {
+      color: textureLoader.load('50-free-textures-4+normalmaps/199.JPG'),
+      normal: textureLoader.load('50-free-textures-4+normalmaps/199_norm.JPG'),
+    },
+    {
       color: textureLoader.load('50-free-textures-4+normalmaps/188.JPG'),
       normal: textureLoader.load('50-free-textures-4+normalmaps/188_norm.JPG'),
     },
@@ -191,10 +195,6 @@ export function loadTextures(textureLoader) {
     {
       color: textureLoader.load('50-free-textures-4+normalmaps/198.JPG'),
       normal: textureLoader.load('50-free-textures-4+normalmaps/198_norm.JPG'),
-    },
-    {
-      color: textureLoader.load('50-free-textures-4+normalmaps/199.JPG'),
-      normal: textureLoader.load('50-free-textures-4+normalmaps/199_norm.JPG'),
     },
     {
       color: textureLoader.load('50-free-textures-4+normalmaps/200.JPG'),
