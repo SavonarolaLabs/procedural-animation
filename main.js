@@ -4,7 +4,6 @@ import { setupCamera, setupMovementControls } from './camera.js';
 import { addResizeListener } from './resize.js';
 import { cycleTexture } from './cycleTexture.js';
 import { createGround } from './ground.js';
-import { loadSkeleton } from './skeletonLoader.js';
 import { loadBot } from './botLoader.js';
 import { setupCharacterMovement } from './characterMovement.js';
 
@@ -29,8 +28,8 @@ directionalLight.shadow.mapSize.width = 2048;
 directionalLight.shadow.mapSize.height = 2048;
 scene.add(directionalLight);
 
-const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
-scene.add(lightHelper);
+//const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+//scene.add(lightHelper);
 
 const textureLoader = new THREE.TextureLoader();
 const textures = loadTextures(textureLoader);
@@ -44,52 +43,30 @@ textures.forEach((texture) => {
 const { groundMaterial, ground } = createGround(scene, textures, THREE);
 ground.receiveShadow = true;
 
-let mixer;
-let animations = [];
-let currentAnimation = 0;
-let currentAction = null;
-const actions = {};
-
 const cameraControls = setupMovementControls(camera, renderer, THREE);
 const { orbitControls } = cameraControls;
 
 let characterMovement;
 
-loadBot(scene, textureLoader, THREE, 'bot').then(({ model, animations: animClips }) => {
-  handleModelLoad(model, animClips);
+loadBot(scene, textureLoader, THREE).then(({ model }) => {
+  model.position.set(0, 0, 2);
+
+  model.traverse((child) => {
+    if (child.isMesh) {
+      child.castShadow = true;
+    }
+  });
+
+  characterMovement = setupCharacterMovement(scene, model, camera, renderer, THREE);
+
+  scene.add(model);
+
+  const box = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+
+  orbitControls.target.copy(center);
+  orbitControls.update();
 });
-
-function handleModelLoad(model, animClips) {
-  if (animClips.length) {
-    animations = animClips;
-
-    mixer = new THREE.AnimationMixer(model);
-    model.position.set(0, 0, 2);
-
-    model.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-      }
-    });
-
-    animations.forEach((clip, index) => {
-      const action = mixer.clipAction(clip);
-      action.clampWhenFinished = true;
-      action.loop = THREE.LoopRepeat;
-      actions[index] = action;
-    });
-
-    characterMovement = setupCharacterMovement(scene, model, camera, renderer, THREE);
-
-    scene.add(model);
-
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-
-    orbitControls.target.copy(center);
-    orbitControls.update();
-  }
-}
 
 window.addEventListener('keydown', (event) => {
   switch (event.key.toUpperCase()) {
@@ -99,38 +76,8 @@ window.addEventListener('keydown', (event) => {
     case '9':
       cycleTexture(groundMaterial, textures, false);
       break;
-    case 'X':
-      if (animations.length) {
-        currentAnimation = (currentAnimation + 1) % animations.length;
-        playAnimation(currentAnimation);
-      }
-      break;
-    case 'Z':
-      if (animations.length) {
-        currentAnimation = (currentAnimation - 1 + animations.length) % animations.length;
-        playAnimation(currentAnimation);
-      }
-      break;
   }
 });
-
-function playAnimation(index) {
-  if (mixer && animations.length) {
-    if (currentAction) {
-      currentAction.stop();
-    }
-
-    const action = actions[index];
-    const speedFactor = 1;
-    action.timeScale = speedFactor;
-    action.reset();
-    action.play();
-
-    currentAction = action;
-  }
-}
-
-const clock = new THREE.Clock();
 
 function animate() {
   requestAnimationFrame(animate);
@@ -139,14 +86,9 @@ function animate() {
 
   if (characterMovement) characterMovement.update();
 
-  if (mixer) {
-    const delta = clock.getDelta();
-    mixer.update(delta);
-  }
-
   // Keep light source behind the camera
   directionalLight.position.copy(camera.position);
-  directionalLight.position.add(new THREE.Vector3(10, 10, 10)); // Slightly offset the light from the camera position
+  directionalLight.position.add(new THREE.Vector3(10, 10, 10));
 
   renderer.render(scene, camera);
 }
