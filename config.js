@@ -17,7 +17,7 @@ export const HERO_STARTING_POSITION = { x: 0, y: 0, z: 2 }; // Starting position
 // Camera defaults, with offsets relative to HERO_STARTING_POSITION
 export const CAMERA_OFFSET = {
   x: -MAP_SIZE * 0.015, // Adjust left/right distance
-  y: MAP_SIZE * 0.13, // Increase height for top-down view (try values between 0.1-0.2)
+  y: MAP_SIZE * 0.2, // Increase height for top-down view (try values between 0.1-0.2)
   z: -MAP_SIZE * 0.05, // Increase backward distance
 };
 
