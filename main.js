@@ -145,7 +145,7 @@ function fireBullet() {
 
   const bulletBody = createBullet(bulletSpawnPosition, bulletDirection);
 
-  const bulletGeometry = new THREE.SphereGeometry(config.HERO_SIZE / 5, 8, 8);
+  const bulletGeometry = new THREE.SphereGeometry(config.HERO_SIZE / 2, 8, 8);
   const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   const bulletMesh = new THREE.Mesh(bulletGeometry, bulletMaterial);
 
