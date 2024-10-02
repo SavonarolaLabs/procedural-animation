@@ -29,7 +29,7 @@ export function stepWorld(dt) {
  * @param {string} direction - The direction to apply the force ('left', 'right', 'up', 'down').
  */
 export function applyHeroForce(direction) {
-  const impulse = heroSpeed * 0.1; // Adjusted for proper responsiveness
+  const impulse = heroSpeed * 0.1;
   const heroPosition = heroBody.getPosition();
 
   let appliedImpulse;
@@ -41,10 +41,10 @@ export function applyHeroForce(direction) {
       appliedImpulse = planck.Vec2(0, -impulse);
       break;
     case 'left':
-      appliedImpulse = planck.Vec2(-impulse, 0);
+      appliedImpulse = planck.Vec2(impulse, 0); // Reverse left and right
       break;
     case 'right':
-      appliedImpulse = planck.Vec2(impulse, 0);
+      appliedImpulse = planck.Vec2(-impulse, 0); // Reverse left and right
       break;
   }
 
