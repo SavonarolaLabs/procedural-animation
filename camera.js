@@ -54,18 +54,18 @@ export function setupMovementControls(camera, renderer, THREE, target = new THRE
 
   function handleKeyDown(event) {
     switch (event.code) {
-      case 'KeyW':
-        moveForward = true;
-        break;
-      case 'KeyS':
-        moveBackward = true;
-        break;
-      case 'KeyA':
-        moveLeft = true;
-        break;
-      case 'KeyD':
-        moveRight = true;
-        break;
+      // case 'KeyW':
+      //   moveForward = true;
+      //   break;
+      // case 'KeyS':
+      //   moveBackward = true;
+      //   break;
+      // case 'KeyA':
+      //   moveLeft = true;
+      //   break;
+      // case 'KeyD':
+      //   moveRight = true;
+      //   break;
       case 'Digit1':
         zoomIn = true;
         break;
@@ -88,18 +88,18 @@ export function setupMovementControls(camera, renderer, THREE, target = new THRE
 
   function handleKeyUp(event) {
     switch (event.code) {
-      case 'KeyW':
-        moveForward = false;
-        break;
-      case 'KeyS':
-        moveBackward = false;
-        break;
-      case 'KeyA':
-        moveLeft = false;
-        break;
-      case 'KeyD':
-        moveRight = false;
-        break;
+      // case 'KeyW':
+      //   moveForward = false;
+      //   break;
+      // case 'KeyS':
+      //   moveBackward = false;
+      //   break;
+      // case 'KeyA':
+      //   moveLeft = false;
+      //   break;
+      // case 'KeyD':
+      //   moveRight = false;
+      //   break;
       case 'Digit1':
         zoomIn = false;
         break;

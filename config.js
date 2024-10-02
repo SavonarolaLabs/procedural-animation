@@ -27,3 +27,5 @@ export const CAMERA_DEFAULT_TARGET = { x: HERO_STARTING_POSITION.x, y: HERO_SIZE
 export const HERO_SCALE = { x: 1, y: 1, z: 1 };
 export const HERO_MOVE_SPEED = 3.7; // Speed of hero movement per frame
 export const HERO_ROTATION_SPEED = 0.05; // Speed of hero rotation
+
+export const PLANCK_TO_THREE_SCALE = 100; // Scaling factor between Planck and Three.js units
