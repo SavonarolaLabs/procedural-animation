@@ -9,6 +9,7 @@ import * as config from './config.js';
  */
 export function createGround(scene, textures, THREE) {
   const groundGeometry = new THREE.PlaneGeometry(config.MAP_SIZE, config.MAP_SIZE);
+  textures[0].color.rotation = Math.PI;
   const groundMaterial = new THREE.MeshStandardMaterial({
     map: textures[0].color,
     normalMap: textures[0].normal,
