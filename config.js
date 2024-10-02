@@ -15,7 +15,12 @@ export const ZOOM_SPEED_PERCENTAGE = 0.005; // Zoom speed relative to map size
 export const HERO_STARTING_POSITION = { x: 0, y: 0, z: 2 }; // Starting position of the hero
 
 // Camera defaults, with offsets relative to HERO_STARTING_POSITION
-export const CAMERA_OFFSET = { x: -MAP_SIZE * 0.015, y: MAP_SIZE * 0.025, z: -MAP_SIZE * 0.015 };
+export const CAMERA_OFFSET = {
+  x: -MAP_SIZE * 0.015, // Adjust left/right distance
+  y: MAP_SIZE * 0.13, // Increase height for top-down view (try values between 0.1-0.2)
+  z: -MAP_SIZE * 0.05, // Increase backward distance
+};
+
 export const CAMERA_DEFAULT_TARGET = { x: HERO_STARTING_POSITION.x, y: HERO_SIZE * 0.05, z: HERO_STARTING_POSITION.z };
 
 // Scale multiplier for bot models (1 = 100% of HERO_SIZE)
