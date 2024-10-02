@@ -1,14 +1,22 @@
 import { OrbitControls } from './node_modules/three/examples/jsm/controls/OrbitControls.js';
+import * as config from './config.js';
 
 export function setupCamera(THREE) {
-  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(-15, 50, -15); // Elevate camera higher
-  camera.lookAt(new THREE.Vector3(0, 0, 0)); // Adjust to look towards the character
+  // Camera position relative to the hero's starting position
+  const cameraPosition = {
+    x: config.HERO_STARTING_POSITION.x + config.CAMERA_OFFSET.x,
+    y: config.HERO_STARTING_POSITION.y + config.CAMERA_OFFSET.y,
+    z: config.HERO_STARTING_POSITION.z + config.CAMERA_OFFSET.z,
+  };
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, config.MAP_SIZE * 2);
+  camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+  camera.lookAt(new THREE.Vector3(config.CAMERA_DEFAULT_TARGET.x, config.CAMERA_DEFAULT_TARGET.y, config.CAMERA_DEFAULT_TARGET.z));
 
   return camera;
 }
 
-export function setupMovementControls(camera, renderer, THREE, target = new THREE.Vector3(0, 5, 0)) {
+export function setupMovementControls(camera, renderer, THREE, target = new THREE.Vector3(config.CAMERA_DEFAULT_TARGET.x, config.CAMERA_DEFAULT_TARGET.y, config.CAMERA_DEFAULT_TARGET.z)) {
   let moveForward = false,
     moveBackward = false,
     moveLeft = false,
@@ -17,11 +25,16 @@ export function setupMovementControls(camera, renderer, THREE, target = new THRE
     zoomOut = false;
   let orbitalMode = false;
 
-  const moveSpeed = 0.1;
-  const zoomSpeed = 0.5;
+  // Using percentage for easier understanding of movement speed
+  const moveSpeed = config.MAP_SIZE * config.MOVE_SPEED_PERCENTAGE;
+  const zoomSpeed = config.MAP_SIZE * config.ZOOM_SPEED_PERCENTAGE;
 
   // Store default camera position and target
-  const defaultPosition = new THREE.Vector3(-15, 25, -15);
+  const defaultPosition = new THREE.Vector3(
+    config.HERO_STARTING_POSITION.x + config.CAMERA_OFFSET.x,
+    config.HERO_STARTING_POSITION.y + config.CAMERA_OFFSET.y,
+    config.HERO_STARTING_POSITION.z + config.CAMERA_OFFSET.z
+  );
   const defaultTarget = target.clone(); // Should be the same as the lookAt position in setupCamera
 
   // Initialize OrbitControls
@@ -122,8 +135,8 @@ export function setupMovementControls(camera, renderer, THREE, target = new THRE
       rightVector.y = 0;
       rightVector.normalize();
 
-      camera.position.add(rightVector.clone().multiplyScalar(-deltaX * 0.05));
-      camera.position.add(forwardVector.clone().multiplyScalar(deltaY * 0.05));
+      camera.position.add(rightVector.clone().multiplyScalar(-deltaX * config.MAP_SIZE * 0.00005));
+      camera.position.add(forwardVector.clone().multiplyScalar(deltaY * config.MAP_SIZE * 0.00005));
     }
   });
 

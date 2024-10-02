@@ -6,6 +6,7 @@ import { cycleTexture } from './cycleTexture.js';
 import { createGround } from './ground.js';
 import { loadBot } from './botLoader.js';
 import { setupCharacterMovement } from './characterMovement.js';
+import * as config from './config.js';
 
 const scene = new THREE.Scene();
 const camera = setupCamera(THREE);
@@ -18,37 +19,34 @@ document.body.appendChild(renderer.domElement);
 
 renderer.domElement.addEventListener('contextmenu', (event) => event.preventDefault());
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+const ambientLight = new THREE.AmbientLight(0xffffff, config.AMBIENT_LIGHT_INTENSITY);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-directionalLight.position.set(10, 20, 10);
+const directionalLight = new THREE.DirectionalLight(0xffffff, config.DIRECTIONAL_LIGHT_INTENSITY);
+directionalLight.position.set(config.DIRECTIONAL_LIGHT_POSITION.x, config.DIRECTIONAL_LIGHT_POSITION.y, config.DIRECTIONAL_LIGHT_POSITION.z);
 directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 2048;
-directionalLight.shadow.mapSize.height = 2048;
+directionalLight.shadow.mapSize.width = config.SHADOW_MAP_SIZE;
+directionalLight.shadow.mapSize.height = config.SHADOW_MAP_SIZE;
 scene.add(directionalLight);
-
-//const lightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
-//scene.add(lightHelper);
 
 const textureLoader = new THREE.TextureLoader();
 const textures = loadTextures(textureLoader);
 
 textures.forEach((texture) => {
   texture.color.wrapS = texture.color.wrapT = THREE.RepeatWrapping;
-  const x = 50;
-  texture.color.repeat.set(x, x);
+  texture.color.repeat.set(config.TEXTURE_REPEAT, config.TEXTURE_REPEAT);
 });
 
-const { groundMaterial, ground } = createGround(scene, textures, THREE);
+const { groundMaterial, ground } = createGround(scene, textures, THREE, config.MAP_SIZE);
 ground.receiveShadow = true;
 
-const cameraControls = setupMovementControls(camera, renderer, THREE);
+const cameraControls = setupMovementControls(camera, renderer, THREE, config.MAP_SIZE);
 const { orbitControls } = cameraControls;
 
 let characterMovement;
 
-loadBot(scene, textureLoader, THREE).then(({ model }) => {
+loadBot(scene, textureLoader, THREE, config.HERO_SIZE).then(({ model }) => {
+  model.scale.set(config.HERO_SIZE, config.HERO_SIZE, config.HERO_SIZE); // Scaling model to hero size
   model.position.set(0, 0, 2);
 
   model.traverse((child) => {
@@ -88,7 +86,7 @@ function animate() {
 
   // Keep light source behind the camera
   directionalLight.position.copy(camera.position);
-  directionalLight.position.add(new THREE.Vector3(10, 10, 10));
+  directionalLight.position.add(new THREE.Vector3(config.CAMERA_LIGHT_OFFSET.x, config.CAMERA_LIGHT_OFFSET.y, config.CAMERA_LIGHT_OFFSET.z));
 
   renderer.render(scene, camera);
 }

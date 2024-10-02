@@ -1,12 +1,26 @@
+import * as config from './config.js';
+
+/**
+ * Sets up character movement within the scene.
+ * @param {THREE.Scene} scene - The scene containing the character and ground.
+ * @param {THREE.Object3D} character - The character model to move.
+ * @param {THREE.Camera} camera - The camera used for raycasting.
+ * @param {THREE.WebGLRenderer} renderer - The renderer handling mouse events.
+ * @param {typeof import('three')} THREE - The THREE module reference.
+ * @param {Function} [startMoving] - Optional callback when character starts moving.
+ * @param {Function} [stopMoving] - Optional callback when character stops moving.
+ * @returns {{update: Function}} - An object with an update function for animation loop.
+ */
 export function setupCharacterMovement(scene, character, camera, renderer, THREE, startMoving, stopMoving) {
   let targetPosition = new THREE.Vector3();
   let moving = false;
-  const moveSpeed = 0.7;
-  const rotationSpeed = 0.05;
+  const moveSpeed = config.HERO_MOVE_SPEED;
+  const rotationSpeed = config.HERO_ROTATION_SPEED;
 
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
+  // Event listener for movement
   renderer.domElement.addEventListener('mousedown', (event) => {
     if (event.button === 2) {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -22,6 +36,9 @@ export function setupCharacterMovement(scene, character, camera, renderer, THREE
     }
   });
 
+  /**
+   * Updates the character's direction to face the target position.
+   */
   function updateCharacterDirection() {
     const direction = new THREE.Vector3();
     direction.subVectors(targetPosition, character.position).normalize();
@@ -36,6 +53,9 @@ export function setupCharacterMovement(scene, character, camera, renderer, THREE
     }
   }
 
+  /**
+   * Moves the character towards the target position.
+   */
   function moveCharacter() {
     if (moving) {
       updateCharacterDirection();

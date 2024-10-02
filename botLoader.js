@@ -1,5 +1,15 @@
 import { FBXLoader } from './node_modules/three/examples/jsm/loaders/FBXLoader.js';
+import * as config from './config.js';
+import { applyHeroScaling } from './modelUtils.js';
 
+/**
+ * Loads a bot model (FBX) into the scene with optional textures and animations.
+ * @param {THREE.Scene} scene - The scene to add the bot to.
+ * @param {THREE.TextureLoader} textureLoader - Loader for textures.
+ * @param {typeof import('three')} THREE - The THREE module reference.
+ * @param {string} [name='bot'] - The name of the FBX model file (without extension).
+ * @returns {Promise<{model: THREE.Group, animations: THREE.AnimationClip[]}>} - A promise that resolves with the loaded model and animations.
+ */
 export function loadBot(scene, textureLoader, THREE, name = 'bot') {
   return new Promise((resolve, reject) => {
     const loader = new FBXLoader();
@@ -14,6 +24,7 @@ export function loadBot(scene, textureLoader, THREE, name = 'bot') {
         const aoMap = textureLoader.load('DefaultTextures/DefaultMaterial_Mixed_AO.png');
         const emissiveMap = textureLoader.load('DefaultTextures/DefaultMaterial_Emissive.png');
 
+        // Traverse the model to apply textures and shadow properties
         fbx.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
@@ -37,7 +48,10 @@ export function loadBot(scene, textureLoader, THREE, name = 'bot') {
           }
         });
 
-        const botAxesHelper = new THREE.AxesHelper(5);
+        // Apply scaling to match hero size
+        applyHeroScaling(fbx);
+
+        const botAxesHelper = new THREE.AxesHelper(config.HERO_SIZE * 0.05); // Adjust size relative to hero size
         fbx.add(botAxesHelper);
         scene.add(fbx);
 
