@@ -47,6 +47,7 @@ const { orbitControls } = cameraControls;
 let characterMovement;
 let heroModel;
 
+// Ensure this is called after `heroModel` is loaded
 loadBot(scene, textureLoader, THREE).then(({ model }) => {
   heroModel = model;
   heroModel.position.set(config.HERO_STARTING_POSITION.x, config.HERO_STARTING_POSITION.y, config.HERO_STARTING_POSITION.z);
@@ -110,7 +111,7 @@ window.addEventListener('keyup', (event) => {
 });
 
 const bullets = [];
-const bulletSpeed = 30; // Define bullet speed for Three.js and Planck.js
+const bulletSpeed = 60; // Define bullet speed for Three.js and Planck.js
 const bulletLifetime = 2000; // Lifetime of bullets in milliseconds
 
 // Track mouse position for aiming
@@ -150,7 +151,7 @@ function fireBullet() {
   const bulletBody = createBullet(heroPosition, bulletDirection);
 
   // Create a visual sphere for the bullet
-  const bulletGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+  const bulletGeometry = new THREE.SphereGeometry(config.HERO_SIZE / 5, 8, 8);
   const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   const bulletMesh = new THREE.Mesh(bulletGeometry, bulletMaterial);
 
