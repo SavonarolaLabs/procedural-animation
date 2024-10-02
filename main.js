@@ -128,36 +128,29 @@ function fireBullet() {
   if (!heroModel) return;
 
   const heroPosition = heroBody.getPosition();
-
-  // Create a raycaster from the camera through the mouse position
   const raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(mouse, camera);
-
-  // Assume bullets are fired along the ground plane (y = 0)
   const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const intersectPoint = new THREE.Vector3();
 
   raycaster.ray.intersectPlane(groundPlane, intersectPoint);
 
-  // Compute direction from hero to intersectPoint
   const heroWorldPosition = new THREE.Vector3(heroPosition.x * config.PLANCK_TO_THREE_SCALE, 0, heroPosition.y * config.PLANCK_TO_THREE_SCALE);
-
   const directionVector = intersectPoint.sub(heroWorldPosition).normalize();
 
-  // Convert direction to Planck.js world (Vec2)
   const bulletDirection = planck.Vec2(directionVector.x * bulletSpeed, directionVector.z * bulletSpeed);
 
-  // Create bullet in physics world
-  const bulletBody = createBullet(heroPosition, bulletDirection);
+  const spawnOffset = directionVector.clone().multiplyScalar(config.HERO_SIZE * 4); // Offset by twice the hero size
+  const bulletSpawnPosition = planck.Vec2(heroPosition.x + spawnOffset.x / config.PLANCK_TO_THREE_SCALE, heroPosition.y + spawnOffset.y / config.PLANCK_TO_THREE_SCALE);
 
-  // Create a visual sphere for the bullet
+  const bulletBody = createBullet(bulletSpawnPosition, bulletDirection);
+
   const bulletGeometry = new THREE.SphereGeometry(config.HERO_SIZE / 5, 8, 8);
   const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   const bulletMesh = new THREE.Mesh(bulletGeometry, bulletMaterial);
 
   scene.add(bulletMesh);
 
-  // Store bullet body, mesh, creationTime
   bullets.push({ body: bulletBody, mesh: bulletMesh, creationTime: Date.now() });
 }
 
